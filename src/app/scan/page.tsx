@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-import { useRouter } from 'next/router';
 
 interface Attendant {
   id: string;
@@ -78,11 +77,11 @@ export default function ScanPage() {
 
   return (
     <div className="p-4">
-        attendanceDone ? (
+        {attendanceDone ? (
           <p>Asistencia registrada correctamente. ¡Gracias {attendant.name}!</p>
         ) : (
           <p>Registrando tu asistencia...</p>
-        )
+        )}
     </div>
   );
 }
