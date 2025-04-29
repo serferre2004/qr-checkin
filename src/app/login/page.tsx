@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
@@ -58,6 +58,7 @@ export default function LoginPage() {
   };
 
   return (
+    <Suspense>
     <main className="p-6 max-w-md mx-auto">
       <h1 className="text-xl font-bold mb-4">Registro de Asistente</h1>
 
@@ -85,18 +86,19 @@ export default function LoginPage() {
           value={formData.type}
           onChange={handleChange}
           className="w-full p-2 border rounded"
-        />
+          />
 
         <button
           type="submit"
           disabled={loading}
           className="w-full p-2 bg-blue-600 text-white rounded"
-        >
+          >
           {loading ? "Registrando..." : "Registrarme"}
         </button>
 
         {errorMsg && <p className="text-red-600">{errorMsg}</p>}
       </form>
     </main>
+    </Suspense>
   );
 }
