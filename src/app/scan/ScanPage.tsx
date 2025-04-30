@@ -58,12 +58,12 @@ export default function ScanPage() {
   useEffect(() => {
     if (!attendant) {
       const timer = setTimeout(() => {
-        router.push('/login'); // Redirect after 3 seconds
+        router.push(`/login?id=${sessionId}`); // Redirect after 3 seconds
       }, 3000); // 3000 ms = 3 seconds
 
       return () => clearTimeout(timer); // Clear the timer if the component unmounts
     }
-  }, [attendant, router]);
+  }, [attendant, router, sessionId]);
 
   if (loading) return <p>Cargando...</p>;
 

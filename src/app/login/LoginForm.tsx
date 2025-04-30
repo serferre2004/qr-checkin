@@ -57,7 +57,7 @@ export default function LoginForm() {
     if (sessionId) {
       router.push(`/scan?id=${sessionId}`);
     } else {
-      router.push("/");
+      router.push("/program");
     }
   };
 
