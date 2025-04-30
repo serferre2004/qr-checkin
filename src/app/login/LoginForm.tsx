@@ -36,28 +36,30 @@ export default function LoginForm() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg("");
+      e.preventDefault();
+      setLoading(true);
+      setErrorMsg("");
 
-    const { data, error } = await supabase
-      .from("attendants")
-      .insert([formData])
-      .select()
+      const { data, error } = await supabase
+      .from('attendants')
+      .select('*')
+      .eq('email', formData.email)
       .single();
-
+    
     if (error) {
-      setErrorMsg("Error al registrar. Intenta nuevamente.");
+      setErrorMsg('Email not found');
       setLoading(false);
       return;
     }
-
+      
+    // Si llega aquí, las credenciales son válidas
+    
     localStorage.setItem("attendant", JSON.stringify(data));
 
     if (sessionId) {
       router.push(`/scan?id=${sessionId}`);
     } else {
-      router.push("/program");
+      router.push("/");
     }
   };
 
@@ -68,7 +70,7 @@ export default function LoginForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           name="name"
-          placeholder="Nombre completo"
+          placeholder="Full name"
           required
           value={formData.name}
           onChange={handleChange}
@@ -77,7 +79,7 @@ export default function LoginForm() {
         <input
           name="email"
           type="email"
-          placeholder="Correo electrónico"
+          placeholder="Email"
           required
           value={formData.email}
           onChange={handleChange}
@@ -85,7 +87,7 @@ export default function LoginForm() {
         />
         <input
           name="type"
-          placeholder="Tipo (estudiante, ponente...)"
+          placeholder="Registration type"
           value={formData.type}
           onChange={handleChange}
           className="w-full p-2 border rounded"
