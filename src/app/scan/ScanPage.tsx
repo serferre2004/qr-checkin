@@ -131,7 +131,7 @@ export default function ScanPage() {
   if (loading) return <div className={styles.loader}><Image src="/logo_transparente.png" alt="logo" width={400} height={400} className={styles.loaderImage}/></div>
   if (!sessionExists) return notFound();
   return (
-  <div>  
+  <div className={styles.page}>  
     <div className={styles.container}>
       <header className={styles.header}>
         <Image src="/logo_transparente.png" alt="logo" width={100} height={100} className={styles.logo}/>
