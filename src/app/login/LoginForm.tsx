@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
+import styles from './Loginstyle.module.css';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -64,9 +65,8 @@ export default function LoginForm() {
   };
 
   return (
-    <main className="p-6 max-w-md mx-auto">
-      <h1 className="text-xl font-bold mb-4">Registro de Asistente</h1>
-
+    <main className={styles.mainContainer}>
+      <h1 className={styles.title}>Log in to the event</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           name="name"
@@ -74,7 +74,7 @@ export default function LoginForm() {
           required
           value={formData.name}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className={styles.inputField}
         />
         <input
           name="email"
@@ -83,22 +83,22 @@ export default function LoginForm() {
           required
           value={formData.email}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className={styles.inputField}
         />
         <input
           name="type"
           placeholder="Registration type"
           value={formData.type}
           onChange={handleChange}
-          className="w-full p-2 border rounded"
+          className={styles.inputField}
         />
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full p-2 bg-blue-600 text-white rounded"
+          className={styles.button}
         >
-          {loading ? "Registrando..." : "Registrarme"}
+          {loading ? "Logging..." : "Log In"}
         </button>
 
         {errorMsg && <p className="text-red-600">{errorMsg}</p>}

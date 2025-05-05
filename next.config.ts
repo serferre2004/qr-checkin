@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
 };
 
 module.exports = {
+  images: {
+    domains: ['wp.nyu.edu'],
+  },
   async redirects() {
     return [
       {
