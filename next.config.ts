@@ -11,7 +11,7 @@ module.exports = {
   async redirects() {
     return [
       {
-        source: '/',
+        source: '/program',
         destination: 'https://pepqa.co/program/',
         permanent: false,
         basePath: false

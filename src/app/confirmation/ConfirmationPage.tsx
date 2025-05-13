@@ -1,7 +1,7 @@
 "use client";
-import styles from './ScanView.module.css';
+import styles from './confirmation.module.css';
 import { useEffect, useState } from 'react';
-import { notFound, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Image from 'next/image';
 
@@ -18,31 +18,11 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function ScanPage() {
+export default function ConfirmationPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get('id');
-  const [sessionName, setSessionName] = useState("");
-  const [sessionLink, setSessionLink] = useState("");
   const [attendant, setAttendant] = useState<Attendant | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sessionExists, setSessionExists] = useState(true);
   const [attendanceDone, setAttendanceDone] = useState(false);
-
-  useEffect(() => {
-    const sessionDetails = async () => {
-      const { data, error } = await supabase.from('sessions').select('*').eq('id', sessionId).single();
-      if (error || !data) {
-        setLoading(false);
-        setSessionExists(false);
-        return;
-      } else {
-        setSessionName(data.name);
-        setSessionLink(data.interaction_url);
-      }
-    }
-    sessionDetails();
-  }, [sessionId, sessionExists, sessionName, sessionLink]);
 
 
   useEffect(() => {
@@ -89,47 +69,65 @@ export default function ScanPage() {
 
   useEffect(() => {
     const registerAttendance = async () => {
-      if (attendant && sessionId && !attendanceDone) {
-        const { data, error } = await supabase.from('attendance').select('*').eq('attendant_id', attendant.id).eq('session_id', sessionId).limit(1);
-        if (error) {
-          console.error(error);
-          return;
+      try {
+        if (!attendant || attendanceDone) return;
+
+        // 1. Verificar si ya existe un registro hoy
+        const today = new Date().toLocaleDateString('es-CO', {
+          timeZone: 'America/Bogota',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).split('/').reverse().join('-');
+        const { data: existingRegistration, error: queryError } = await supabase
+        .from('registrations')
+        .select('*')
+        .eq('attendant_id', attendant.id)
+        .eq('date', today)
+        .limit(1);
+        
+        if (queryError) {
+          throw new Error(`Error al verificar registro: ${queryError.message}`);
         }
-        if (!data){
-          const { error } = await supabase.from('attendance').insert([
-            {
-              attendant_id: attendant.id,
-              session_id: sessionId,
-              checked_at: new Date().toISOString()
-            }
-          ]);
-          if (!error) {
-            setAttendanceDone(true);
-          } else {
-            console.error('Error registrando asistencia:', error);
+        
+        if (!existingRegistration || existingRegistration.length == 0) {
+          const { error: insertError } = await supabase
+            .from('registrations')
+            .insert([
+              {
+                attendant_id: attendant.id,
+                date: today
+              }
+            ]);
+
+          if (insertError) {
+            throw new Error(`Error al insertar registro: ${insertError.message}`);
           }
-        } else {
-          setAttendanceDone(true);
         }
+
+        setAttendanceDone(true);
+
+      } catch (error) {
+        console.error('Error en registerAttendance:', error);
+        // Aquí podrías agregar un toast o alerta al usuario
       }
     };
 
     registerAttendance();
-  }, [attendant, sessionId, attendanceDone]);
+  }, [attendant, attendanceDone]);
 
   useEffect(() => {
     if (loading) return;
     if (!attendant) {
       const timer = setTimeout(() => {
-        router.push(`/login?id=${sessionId}`); // Redirect after 3 seconds
+        router.push('/login'); // Redirect after 3 seconds
       }, 3000); // 3000 ms = 3 seconds
 
       return () => clearTimeout(timer); // Clear the timer if the component unmounts
     }
-  }, [attendant, loading, router, sessionId]);
+  }, [attendant, loading, router]);
 
   if (loading) return <div className={styles.loader}><Image src="/logo_transparente.png" alt="logo" width={400} height={400} className={styles.loaderImage}/></div>
-  if (!sessionExists) return notFound();
   return (
   <div className={styles.page}>
     <div className={styles.container}>
@@ -138,24 +136,21 @@ export default function ScanPage() {
       </header>
       <div className={styles.statusContainer}>
       { attendant ? (
-          <><h1>Welcome to </h1> <h1 className={styles.sessionName}>TUTORIAL 4</h1></>
+          <>
+            <h1>Registration completed</h1>
+            <a href='/program'>
+              <div className={styles.button}>
+              Check the event program
+              </div>
+            </a>
+          </>
       ) : (
         <h1>Didn&apos;t find any data. Redirecting to login...</h1>
       )}
       </div>
     </div>
-    <div className={styles.linkContainer}>
-      { attendanceDone ? (
-          <>
-          <p className={styles.preLinkText}>Use slido to interact with the speaker</p>
-          <a href='https://app.sli.do/'>
-            <button className={styles.slidoButton}><Image src="https://wp.nyu.edu/refathbari/files/2020/05/slido_green.png" alt="slido" className={styles.slidoLogo} width={50} height={20}/></button>
-          </a>
-          </>
-        ) : ( attendant ? (
-          <p className={styles.preLinkText}>Processing attendance...</p>
-        ) : (<></>)
-      )}
+    <div className={styles.decorContainer}>
+      <Image className={styles.decor} src='./decor.svg' alt='' width={2000} height={200}/>
     </div>
   </div>
   );
