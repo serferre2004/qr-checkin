@@ -2,21 +2,9 @@
 import styles from './ScanView.module.css';
 import { useEffect, useState } from 'react';
 import { notFound, useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
+import { useSession } from '../../../hooks/useSession';
+import supabase from '../../../lib/supabase';
 import Image from 'next/image';
-
-interface Attendant {
-  id: string;
-  name: string;
-  email: string;
-  type: string;
-}
-
-// Crear cliente de Supabase
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function ScanPage() {
   const router = useRouter();
@@ -24,10 +12,11 @@ export default function ScanPage() {
   const sessionId = searchParams.get('id');
   const [sessionName, setSessionName] = useState("");
   const [sessionLink, setSessionLink] = useState("");
-  const [attendant, setAttendant] = useState<Attendant | null>(null);
+  const [attendant, setAttendant] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sessionExists, setSessionExists] = useState(true);
   const [attendanceDone, setAttendanceDone] = useState(false);
+  const session = useSession();
 
   useEffect(() => {
     const sessionDetails = async () => {
@@ -47,21 +36,14 @@ export default function ScanPage() {
 
   useEffect(() => {
     const verifyStoredUser = async () => {
-      const storedAttendant = localStorage.getItem('attendant');
-      
-      if (!storedAttendant) {
-        setLoading(false);
-        return;
-      }
+      if (!session) return
       else {
-        try {
-          const parsedAttendant = JSON.parse(storedAttendant);
-          
+        try {          
           // 1. Verificar en Supabase si el usuario existe
           const { data, error } = await supabase
             .from('attendants')
             .select('*')
-            .eq('id', parsedAttendant.id) // Usar el ID único
+            .eq('id', session.user.id) // Usar el ID único
             .single();
     
           // 2. Si hay error o no existe
@@ -73,7 +55,7 @@ export default function ScanPage() {
           }
     
           // 3. Si existe, actualizar el estado
-          setAttendant(parsedAttendant);
+          setAttendant(session.user.id);
     
         } catch (error) {
           console.error('Error al verificar usuario:', error);
@@ -85,12 +67,12 @@ export default function ScanPage() {
       };
     }
     verifyStoredUser();
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     const registerAttendance = async () => {
       if (attendant && sessionId && !attendanceDone) {
-        const { data, error } = await supabase.from('attendance').select('*').eq('attendant_id', attendant.id).eq('session_id', sessionId).limit(1);
+        const { data, error } = await supabase.from('attendance').select('*').eq('attendant_id', attendant).eq('session_id', sessionId).limit(1);
         if (error) {
           console.error(error);
           return;
@@ -98,7 +80,7 @@ export default function ScanPage() {
         if (!data){
           const { error } = await supabase.from('attendance').insert([
             {
-              attendant_id: attendant.id,
+              attendant_id: attendant,
               session_id: sessionId,
               checked_at: new Date().toISOString()
             }
@@ -115,7 +97,7 @@ export default function ScanPage() {
     };
 
     registerAttendance();
-  }, [attendant, sessionId, attendanceDone]);
+  }, [session, sessionId, attendanceDone, attendant]);
 
   useEffect(() => {
     if (loading) return;

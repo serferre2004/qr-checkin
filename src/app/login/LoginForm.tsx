@@ -1,95 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+import supabase from "../../../lib/supabase";
 import styles from './Loginstyle.module.css';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("id");
-
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    type: "",
-    password: "1234",
-    country: "test",
-    phone_number: "test",
-    gender: "test",
-    occupation: "test",
-    role: "test",
-    ieee_member: true,
-    organization: "test"
-  });
-
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [email, setEmail] = useState('');
+  const [participation, setParticipation] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setLoading(true);
-      setErrorMsg("");
-
-      const { data, error } = await supabase
-      .from('attendants')
-      .select('*')
-      .eq('email', formData.email)
-      .single();
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
     
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/confirmation`
+      }
+    })
+
     if (error) {
-      setErrorMsg('Email not found');
-      setLoading(false);
-      return;
-    }
-      
-    // Si llega aquí, las credenciales son válidas
-    
-    localStorage.setItem("attendant", JSON.stringify(data));
-
-    if (sessionId) {
-      router.push(`/scan?id=${sessionId}`);
+      setErrorMsg(error.message);
     } else {
-      router.push("/confirmation");
+      if (sessionId) {
+        router.push(`/verify?session=${sessionId}`)
+      } else {
+        router.push('/verify')
+      }
     }
-  };
+    setLoading(false)
+  }
 
   return (
     <main className={styles.mainContainer}>
       <h1 className={styles.title}>Log in to the event</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          name="name"
-          placeholder="Full name"
-          required
-          value={formData.name}
-          onChange={handleChange}
-          className={styles.inputField}
-        />
+      <form onSubmit={handleLogin} className="space-y-4">
         <input
           name="email"
           type="email"
           placeholder="Email"
           required
-          value={formData.email}
-          onChange={handleChange}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className={styles.inputField}
         />
         <input
           name="type"
           placeholder="Registration type"
-          value={formData.type}
-          onChange={handleChange}
+          value={participation}
+          onChange={(e) => setParticipation(e.target.value)}
           className={styles.inputField}
         />
 

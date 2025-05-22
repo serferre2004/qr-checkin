@@ -12,7 +12,6 @@ interface Attendant {
   type: string;
 }
 
-// Crear cliente de Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -20,112 +19,105 @@ const supabase = createClient(
 
 export default function ConfirmationPage() {
   const router = useRouter();
-  const [attendant, setAttendant] = useState<Attendant | null>(null);
+  const [user, setUser] = useState<Attendant | null>(null);
   const [loading, setLoading] = useState(true);
   const [attendanceDone, setAttendanceDone] = useState(false);
 
-
   useEffect(() => {
-    const verifyStoredUser = async () => {
-      const storedAttendant = localStorage.getItem('attendant');
-      
-      if (!storedAttendant) {
-        setLoading(false);
-        return;
-      }
-      else {
-        try {
-          const parsedAttendant = JSON.parse(storedAttendant);
-          
-          // 1. Verificar en Supabase si el usuario existe
-          const { data, error } = await supabase
-            .from('attendants')
-            .select('*')
-            .eq('id', parsedAttendant.id) // Usar el ID único
-            .single();
-    
-          // 2. Si hay error o no existe
-          if (error || !data) {
-            console.log('Usuario no existe en la base de datos');
-            localStorage.removeItem('attendant');
-            setAttendant(null);
-            return;
-          }
-    
-          // 3. Si existe, actualizar el estado
-          setAttendant(parsedAttendant);
-    
-        } catch (error) {
-          console.error('Error al verificar usuario:', error);
-          localStorage.removeItem('attendant');
-          setAttendant(null);
-        } finally {
-          setLoading(false);
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (!session || error) {
+          throw new Error('No hay sesión activa');
         }
-      };
-    }
-    verifyStoredUser();
+
+        // Obtener datos del usuario desde auth.users
+        const { user } = session;
+        
+        // Verificar en tabla attendants
+        const { data: attendantData, error: dbError } = await supabase
+          .from('attendants')
+          .select('*')
+          .eq('email', user.email)
+          .single();
+
+        if (dbError || !attendantData) {
+          throw new Error('Usuario no registrado');
+        }
+
+        setUser({
+          id: user.id,
+          name: attendantData.name,
+          email: user.email!,
+          type: attendantData.type
+        });
+
+      } catch (error) {
+        console.error('Error de autenticación:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
   useEffect(() => {
     const registerAttendance = async () => {
       try {
-        if (!attendant || attendanceDone) return;
+        if (!user || attendanceDone) return;
 
-        // 1. Verificar si ya existe un registro hoy
         const today = new Date().toLocaleDateString('es-CO', {
           timeZone: 'America/Bogota',
           year: 'numeric',
           month: '2-digit',
           day: '2-digit'
         }).split('/').reverse().join('-');
+
         const { data: existingRegistration, error: queryError } = await supabase
-        .from('registrations')
-        .select('*')
-        .eq('attendant_id', attendant.id)
-        .eq('date', today)
-        .limit(1);
+          .from('registrations')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('date', today)
+          .limit(1);
+
+        if (queryError) throw queryError;
         
-        if (queryError) {
-          throw new Error(`Error al verificar registro: ${queryError.message}`);
-        }
-        
-        if (!existingRegistration || existingRegistration.length == 0) {
+        if (!existingRegistration?.length) {
           const { error: insertError } = await supabase
             .from('registrations')
-            .insert([
-              {
-                attendant_id: attendant.id,
-                date: today
-              }
-            ]);
+            .insert([{
+              user_id: user.id,
+              date: today,
+              email: user.email
+            }]);
 
-          if (insertError) {
-            throw new Error(`Error al insertar registro: ${insertError.message}`);
-          }
+          if (insertError) throw insertError;
         }
 
         setAttendanceDone(true);
 
       } catch (error) {
-        console.error('Error en registerAttendance:', error);
-        // Aquí podrías agregar un toast o alerta al usuario
+        console.error('Error en registro:', error);
       }
     };
 
     registerAttendance();
-  }, [attendant, attendanceDone]);
+  }, [user, attendanceDone]);
 
   useEffect(() => {
     if (loading) return;
-    if (!attendant) {
+    
+    if (!user) {
       const timer = setTimeout(() => {
-        router.push('/login'); // Redirect after 3 seconds
-      }, 3000); // 3000 ms = 3 seconds
+        router.push('/login');
+      }, 3000);
 
-      return () => clearTimeout(timer); // Clear the timer if the component unmounts
+      return () => clearTimeout(timer);
     }
-  }, [attendant, loading, router]);
+  }, [user, loading, router]);
 
   if (loading) return <div className={styles.loader}><Image src="/logo_transparente.png" alt="logo" width={400} height={400} className={styles.loaderImage}/></div>
   return (
@@ -135,7 +127,7 @@ export default function ConfirmationPage() {
         <Image src="/logo_transparente.png" alt="logo" width={100} height={100} className={styles.logo}/>
       </header>
       <div className={styles.statusContainer}>
-      { attendant ? (
+      { user ? (
           <>
             <h1>Registration completed</h1>
             <a href='/program'>
