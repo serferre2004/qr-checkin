@@ -1,0 +1,150 @@
+.loginContainer {
+  background: url('https://images.pexels.com/photos/17745834/pexels-photo-17745834/free-photo-of-city-street-with-a-view-of-the-cathedral-of-cartagena-de-indias-i.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') center/cover no-repeat fixed;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.loginContainer::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(149, 167, 149, 0.62);
+  backdrop-filter: blur(5px);
+  z-index: 0;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(550px);
+  position: relative;
+  z-index: 1;
+  padding: 32px 24px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logo {
+  width: 50px;
+  margin: auto;
+  margin-bottom: 32px;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(165, 206, 177, 0.51));
+}
+
+.formTitle {
+  color: #3c6e58;
+  font-size: 1.75rem;
+  margin-bottom: 28px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.formTitleError {
+  color: #e74c3c;
+  font-size: 1.75rem;
+  margin-bottom: 28px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.inputGroup {
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.inputField {
+  width: 100%;
+  padding: 16px 20px 16px 48px;
+  background: #f8fbf9;
+  border: 1px solid #d0e0d8;
+  border-radius: 12px;
+  color: #1a3b2e;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.inputField:focus {
+    outline: none;
+    border-color: #3c6e58;
+    background: #ffffff;
+}
+
+.inputField::placeholder {
+    color: #8aa098;
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5a8c74;
+  font-size: 1.1rem;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 16px;
+  background: #3c6e58;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: 0.3px;
+}
+
+.submitBtn:disabled {
+  background: #2e5a48;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: scale(0.98);
+  background: #5a8c74;
+}
+
+.errorMessage {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 3px;
+}
+
+.error {
+  animation: shake 0.4s ease;
+}
+
+.error .inputField {
+  border-color: #e74c3c !important;
+}
+
+.error .inputIcon {
+  color: #e74c3c;
+  position: absolute;
+  left: 16px;
+  top: 35%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(8px); }
+  75% { transform: translateX(-8px); }
+}

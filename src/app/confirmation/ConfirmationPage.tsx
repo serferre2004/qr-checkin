@@ -1,7 +1,7 @@
 "use client";
 import styles from './confirmation.module.css';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Image from 'next/image';
 
@@ -19,16 +19,20 @@ const supabase = createClient(
 
 export default function ConfirmationPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [user, setUser] = useState<Attendant | null>(null);
   const [loading, setLoading] = useState(true);
   const [attendanceDone, setAttendanceDone] = useState(false);
 
   useEffect(() => {
+
     const checkSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+        console.log('Session data:', session);
+        console.error('Session error:', error);
         if (!session || error) {
+          console.error(error);
           throw new Error('No hay sesión activa');
         }
 
@@ -62,7 +66,7 @@ export default function ConfirmationPage() {
     };
 
     checkSession();
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     const registerAttendance = async () => {
