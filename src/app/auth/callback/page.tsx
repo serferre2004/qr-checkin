@@ -87,7 +87,7 @@ export default function AuthCallback() {
         if (sessionId) {
           router.push(`/scan?session=${sessionId}`);
         } else {
-          router.push('/debug-auth'); // o tu página principal
+          router.push('/login'); // o tu página principal
         }
       }, 1000);
     };
