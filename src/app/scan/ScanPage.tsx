@@ -5,20 +5,77 @@ import { notFound, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from '../../../hooks/useSession';
 import supabase from '../../../lib/supabase';
 import Image from 'next/image';
+import { User } from '@supabase/supabase-js';
 
 export default function ScanPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('id');
-  const [sessionName, setSessionName] = useState("");
-  const [sessionLink, setSessionLink] = useState("");
-  const [attendant, setAttendant] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [sessionInfo, setSessionInfo] = useState<any>({});
+  const [sessionDate, setSessionDate] = useState<Date>(new Date());
+  const weekDays = ['Wed', 'Thu', 'Fri'];
+  const logos = new Map([
+    ['SEL', '/logos/sel.png'],
+    ['PQS', '/logos/pqs.png'],
+    ['UP Sistemas', '/logos/up-sistemas.png'],
+    ['JIC - MTE', '/logos/jic-mte.png'],
+    ['Eaton', '/logos/eaton.png'],
+    ['Plusenergy', '/logos/plusenergy.png']
+  ]);
+  const websites = new Map([
+    ['SEL', 'https://selinc.com/'],
+    ['PQS', 'https://pqs.com.co/'],
+    ['UP Sistemas', 'https://www.upsistemas.com/'],
+    ['JIC - MTE', 'https://jicingenieria.com/'],
+    ['Eaton', 'https://www.eaton.com/co/es-mx.html'],
+    ['Plusenergy', 'https://plusenergy.com.co/']
+  ]);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [sessionExists, setSessionExists] = useState(true);
   const [attendanceDone, setAttendanceDone] = useState(false);
   const session = useSession();
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [authInfo, setAuthInfo] = useState<any>({});
+  
   useEffect(() => {
+    const checkAuthStatus = async () => {
+        try {
+          
+          // Verificar sesión
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          
+          // Verificar usuario
+          const { data: { user }, error: userError } = await supabase.auth.getUser();
+          if (user) {
+            setUser(user);
+          }
+          
+          // Información del localStorage
+          const localStorageInfo = typeof window !== 'undefined' ? {
+            supabaseKeys: Object.keys(localStorage).filter(key => 
+              key.includes('supabase') || key.includes('sb-')
+            ),
+            hasAuthToken: !!localStorage.getItem('sb-auth-token')
+          } : null;
+          
+          setAuthInfo({
+            session: session,
+            user: user,
+            sessionError: sessionError?.message || null,
+            userError: userError?.message || null,
+            localStorage: localStorageInfo,
+            timestamp: new Date().toISOString()
+          });
+          console.log('Auth Info:', authInfo);
+          
+        } catch (error) {
+          console.error('Error checking auth:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
     const sessionDetails = async () => {
       const { data, error } = await supabase.from('sessions').select('*').eq('id', sessionId).single();
       if (error || !data) {
@@ -26,61 +83,29 @@ export default function ScanPage() {
         setSessionExists(false);
         return;
       } else {
-        setSessionName(data.name);
-        setSessionLink(data.interaction_url);
+        setSessionInfo(data);
+        setSessionDate(new Date(data.start_time));
       }
     }
     sessionDetails();
-  }, [sessionId, sessionExists, sessionName, sessionLink]);
+    checkAuthStatus();
+  }, []);
 
 
-  useEffect(() => {
-    const verifyStoredUser = async () => {
-      if (!session) return
-      else {
-        try {          
-          // 1. Verificar en Supabase si el usuario existe
-          const { data, error } = await supabase
-            .from('attendants')
-            .select('*')
-            .eq('id', session.user.id) // Usar el ID único
-            .single();
-    
-          // 2. Si hay error o no existe
-          if (error || !data) {
-            console.log('Usuario no existe en la base de datos');
-            localStorage.removeItem('attendant');
-            setAttendant(null);
-            return;
-          }
-    
-          // 3. Si existe, actualizar el estado
-          setAttendant(session.user.id);
-    
-        } catch (error) {
-          console.error('Error al verificar usuario:', error);
-          localStorage.removeItem('attendant');
-          setAttendant(null);
-        } finally {
-          setLoading(false);
-        }
-      };
-    }
-    verifyStoredUser();
-  }, [session]);
 
   useEffect(() => {
     const registerAttendance = async () => {
-      if (attendant && sessionId && !attendanceDone) {
-        const { data, error } = await supabase.from('attendance').select('*').eq('attendant_id', attendant).eq('session_id', sessionId).limit(1);
+      if (user && sessionId && !attendanceDone) {
+        const { data, error } = await supabase.from('attendance').select('*').eq('attendant_id', user.id).eq('session_id', sessionId).limit(1);
         if (error) {
           console.error(error);
           return;
         }
-        if (!data){
+        console.log('Registering attendance for user:', user?.id, 'in session:', sessionId);
+        if (!data || data.length === 0) {
           const { error } = await supabase.from('attendance').insert([
             {
-              attendant_id: attendant,
+              attendant_id: user.id,
               session_id: sessionId,
               checked_at: new Date().toISOString()
             }
@@ -95,48 +120,101 @@ export default function ScanPage() {
         }
       }
     };
-
     registerAttendance();
-  }, [session, sessionId, attendanceDone, attendant]);
-
+  }, [session, sessionId, attendanceDone, user]);
+  
   useEffect(() => {
+    setLoading(false);
     if (loading) return;
-    if (!attendant) {
+    if (!user) {
       const timer = setTimeout(() => {
         router.push(`/login?id=${sessionId}`); // Redirect after 3 seconds
       }, 3000); // 3000 ms = 3 seconds
 
       return () => clearTimeout(timer); // Clear the timer if the component unmounts
     }
-  }, [attendant, loading, router, sessionId]);
+  }, [user, loading, router, sessionId]);
+
+  function switchSessionType(sessionType: string) {
+    const speakerSessions =(
+      <>
+        <div className={styles.titleContainer}>
+          <h1 className={styles.title}>Welcome to </h1> <h1 className={styles.sessionName}>{sessionInfo.name}</h1>
+          <hr className={styles.divider}></hr>
+        </div>
+        <p className={styles.subtitle}>{sessionInfo.title}</p>
+        <p className={styles.speaker}>Speaker: {sessionInfo.speaker}</p>
+        <p className={styles.description}>{sessionInfo.description}</p>
+        <hr className={styles.divider}></hr>
+        <div className={styles.dateTimeContainer}>
+          <div className={styles.dateContainer}>
+            <p className={styles.dateInfo}>{weekDays[sessionDate.getDate()-4]}</p>
+            <p className={styles.dateNum}>{sessionDate.getDate()}</p>
+            <p className={styles.dateInfo}>Jun</p>
+          </div>
+          <p className={styles.time}>─</p>
+          <p className={styles.time}>{sessionDate.getHours()}:{sessionDate.getMinutes()<10? ("0"+sessionDate.getMinutes()):(sessionDate.getMinutes())}</p>
+        </div>
+      </>
+      );
+
+    const sponsorSessions = (
+      <>
+        <div className={styles.titleContainer}>
+          <h1 className={styles.title}>Welcome to </h1> <h1 className={styles.sessionName}>{sessionInfo.name}</h1>
+          <hr className={styles.divider}></hr>
+        </div>
+        <a href={websites.get(sessionInfo.affiliation) || '#'} target="_blank" rel="noopener noreferrer">
+        <Image
+          src={logos.get(sessionInfo.affiliation) || '/logos/default.png'}
+          alt={`${sessionInfo.affiliation} Logo`}
+          width={100}
+          height={100}
+          className={styles.sponsorLogo}/>
+        </a>
+        <hr className={styles.divider}></hr>
+        <div className={styles.dateTimeContainer}>
+          <div className={styles.dateContainer}>
+            <p className={styles.dateInfo}>{weekDays[sessionDate.getDate()-4]}</p>
+            <p className={styles.dateNum}>{sessionDate.getDate()}</p>
+            <p className={styles.dateInfo}>Jun</p>
+          </div>
+          <p className={styles.time}>─</p>
+          <p className={styles.time}>{sessionDate.getHours()}:{sessionDate.getMinutes()<10? ("0"+sessionDate.getMinutes()):(sessionDate.getMinutes())}</p>
+        </div>
+      </>
+    );
+    switch (sessionType) {
+      case 'keynote':
+        return speakerSessions;
+      case 'special session':
+        return speakerSessions;
+      case 'tutorial':
+        return speakerSessions;
+      case 'sponsor session':
+        return sponsorSessions;
+      default:
+        return (<></>);
+    }
+  }
+
 
   if (loading) return <div className={styles.loader}><Image src="/logo_transparente.png" alt="logo" width={400} height={400} className={styles.loaderImage}/></div>
   if (!sessionExists) return notFound();
   return (
-  <div className={styles.page}>
+  <div className={styles.loginContainer}>
     <div className={styles.container}>
-      <header className={styles.header}>
-        <Image src="/logo_transparente.png" alt="logo" width={100} height={100} className={styles.logo}/>
-      </header>
-      <div className={styles.statusContainer}>
-      { attendant ? (
-          <><h1>Welcome to </h1> <h1 className={styles.sessionName}>TUTORIAL 4</h1></>
+      <Image 
+        src="/logo_transparente.png" 
+        alt="PEPQA Logo" 
+        className={styles.logo}
+        width={200}
+        height={200}
+      />
+      { user ? (
+        switchSessionType(sessionInfo.type)
       ) : (
-        <h1>Didn&apos;t find any data. Redirecting to login...</h1>
-      )}
-      </div>
-    </div>
-    <div className={styles.linkContainer}>
-      { attendanceDone ? (
-          <>
-          <p className={styles.preLinkText}>Use slido to interact with the speaker</p>
-          <a href='https://app.sli.do/'>
-            <button className={styles.slidoButton}><Image src="https://wp.nyu.edu/refathbari/files/2020/05/slido_green.png" alt="slido" className={styles.slidoLogo} width={50} height={20}/></button>
-          </a>
-          </>
-        ) : ( attendant ? (
-          <p className={styles.preLinkText}>Processing attendance...</p>
-        ) : (<></>)
+        <h1 className={styles.titleContainer}>Didn&apos;t find any data. Redirecting to login...</h1>
       )}
     </div>
   </div>

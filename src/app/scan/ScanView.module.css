@@ -1,53 +1,153 @@
-.page {
-    background-color: #f3f3f3;
-    background: linear-gradient(137deg,rgba(243, 243, 243, 1) 0%, rgb(231, 245, 233) 71%, rgb(214, 241, 211) 100%);
-    font-family: "DM Sans", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 700;
-    font-style: normal;
-    padding: 0px;
-    height: 100%;
+.loginContainer {
+  background: url('https://images.pexels.com/photos/17745834/pexels-photo-17745834/free-photo-of-city-street-with-a-view-of-the-cathedral-of-cartagena-de-indias-i.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') center/cover no-repeat fixed;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.loginContainer::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(149, 167, 149, 0.62);
+  backdrop-filter: blur(5px);
+  z-index: 0;
 }
 
 .container {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    max-width: 800px;
-    margin: 0 auto;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(5px);
+  position: relative;
+  z-index: 1;
+  padding: 32px 24px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.header {
-    margin: auto;
+.logo {
+  width: 50px;
+  margin: auto;
+  margin-bottom: 28px;
+  display: block;
+}
+
+.titleContainer {
+    align-items: center;
     text-align: center;
-    margin-bottom: 3rem;
-    padding-top: 30%;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .title {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+  color: #3c6e58;
+  font-size: 1.5rem;
+  margin-bottom: 28px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  display: inline;
 }
 
 .sessionName {
-    font-size: 50px;
+  color: #5eb349;
+  font-size: 1.6rem;
+  margin-bottom: 28px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  display: inline;
 }
 
+.subtitle {
+  color: #59997d;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+  text-align: center;
+}
 
-.statusContainer {
-    font-size: 40px;
-    height: 150px;
+.speaker {
+    color: #e4f8ef;
     text-align: center;
-    display: block;
-    justify-content: center;
-    align-items: center;
-    color: rgb(56, 115, 34);
-    filter: drop-shadow(0px 0px 7px rgba(0,0,0,0.4));
-    margin-bottom: 8rem;
+    margin: 8px 1%;
+    border-radius: 10px;
+    background-color: #3c6e58;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    font-weight: 900;
+    letter-spacing: -0.8px;
 }
 
-.logo img {
-    width: 40% !important;
+.description {
+    color: #638878;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: -1px;
+    margin: 10px 0;
+    justify-content: center;
+    text-align: justify;;
+}
+
+.sponsorLogo {
+    max-width: 80%;
+    min-width: 50%;
+    max-height: 80px;
+    width: auto;
     height: auto;
+    margin: auto;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.divider {
+    width: 100%;
+    opacity: 0.15;
+    margin: 0 auto;
+}
+
+.dateTimeContainer {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.dateContainer {
+    color: #3c6e58;
+    text-align: center;
+    width: 20%;
+    padding: 5px 0;
+    letter-spacing: -1px;
+    margin: 10px 0;
+}
+
+.dateInfo {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: light;
+}
+
+.dateNum {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin: -7px 0;
+}
+
+.time {
+    color: #3c6e58;
+    text-align: center;
+    letter-spacing: -1px;
+    display: block;
+    font-size: 1.9rem;
+    font-weight: 500;
 }
 
 @keyframes loading {
@@ -65,45 +165,4 @@
 .loaderImage {
     animation: loading 2s infinite alternate;
     width: 40%;
-}
-
-.slidoButton {
-    cursor: pointer;
-    border: none;
-    width: 200px;
-    height: 60px;
-    background-color: #f3f3f3;
-    border-radius: 20px;
-    filter: drop-shadow(0px 7px 0px rgba(0,0,0,0.3));
-    transition: all ease 0.2s;
-    margin-top: 10px;
-}
-
-.slidoButton:active {
-    background-color: #d8ddda;
-    transform: translateY(7px);
-    filter: none;
-}
-
-.slidoLogo {
-    position: relative;
-    width: 40% !important;
-    margin: auto;
-}
-
-.linkContainer {
-    background-color: #30631e;
-    text-align: center;
-    justify-content: center;
-    padding-top: 20px;
-    padding-bottom: 60px;
-    width: 100%;
-    margin: 0px;
-    box-shadow: 0px 0px 20px rgba(10,29,3,0.7);
-}
-
-.preLinkText {
-    color: #e6e6e6;
-    font-size: 20px;
-    margin:  15px 60px;
 }

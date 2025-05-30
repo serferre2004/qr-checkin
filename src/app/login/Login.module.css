@@ -21,8 +21,8 @@
 }
 
 .container {
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(550px);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(5px);
   position: relative;
   z-index: 1;
   padding: 32px 24px;
@@ -36,9 +36,8 @@
 .logo {
   width: 50px;
   margin: auto;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   display: block;
-  filter: drop-shadow(0 2px 4px rgba(165, 206, 177, 0.51));
 }
 
 .formTitle {
@@ -65,7 +64,7 @@
 .inputField {
   width: 100%;
   padding: 16px 20px 16px 48px;
-  background: #f8fbf9;
+  background: rgba(248, 251, 249, 0.3);
   border: 1px solid #d0e0d8;
   border-radius: 12px;
   color: #1a3b2e;
@@ -76,8 +75,8 @@
 
 .inputField:focus {
     outline: none;
-    border-color: #3c6e58;
-    background: #ffffff;
+    border-color: rgba(60, 110, 88, 0.8);
+    background: rgba(255, 255, 255, 0.6);
 }
 
 .inputField::placeholder {
@@ -99,7 +98,7 @@
   width: 100%;
   padding: 16px;
   background: #3c6e58;
-  color: #fff;
+  color: #ebecea;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
@@ -113,6 +112,7 @@
   background: #2e5a48;
   opacity: 0.7;
   cursor: not-allowed;
+  color: #a9beb4;
 }
 
 .submitBtn:active:not(:disabled) {
@@ -147,4 +147,34 @@
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(8px); }
   75% { transform: translateX(-8px); }
+}
+
+.tokenInputGroup {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 15px 0;
+}
+
+.digitField {
+  width: 15%;
+  text-align: center;
+  font-weight: bolder;
+  font-size: 22px;
+  height: 60px;
+  background-color: rgba(177, 190, 186, 0.6);
+  border-radius: 7px;
+}
+
+.tokenInputGroup input[type=number]::-webkit-inner-spin-button, 
+.tokenInputGroup input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0;
+}
+
+.digitField:focus {
+  outline: none;
+  background-color: rgba(208, 224, 216, 0.6);
+  caret-color: transparent;
 }

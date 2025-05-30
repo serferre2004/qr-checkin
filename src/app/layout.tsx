@@ -9,7 +9,7 @@ config.autoAddCss = false;
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ['700'],
+  weight: ['700', '400', '500', '300'],
   variable: '--font-dm-sans'
 });
 
