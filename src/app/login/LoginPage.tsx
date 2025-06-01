@@ -83,7 +83,7 @@ export default function LoginPage() {
             router.push(`/scan?id=${sessionId}`);
           }
         }
-      }, []);
+      }, [user]);
 
   const checkAuthStatus = async () => {
     try {
@@ -115,7 +115,7 @@ export default function LoginPage() {
         timestamp: new Date().toISOString()
       });
       console.log('Auth Info:', authInfo);
-      
+
     } catch (error) {
       console.error('Error checking auth:', error);
     } finally {
