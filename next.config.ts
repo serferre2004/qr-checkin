@@ -9,14 +9,7 @@ module.exports = {
     domains: ['wp.nyu.edu', 'pexels.com'],
   },
   async redirects() {
-    return [
-      {
-        source: '/program',
-        destination: 'https://pepqa.co/program/',
-        permanent: false,
-        basePath: false
-      },
-    ]
+    return []
   },
 };
 export default nextConfig;

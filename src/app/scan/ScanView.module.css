@@ -116,7 +116,7 @@
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    margin: 10px 0;
+    margin-top: 5px;
 }
 
 .dateContainer {
@@ -125,7 +125,7 @@
     width: 20%;
     padding: 5px 0;
     letter-spacing: -1px;
-    margin: 10px 0;
+    margin: 0;
 }
 
 .dateInfo {
@@ -138,7 +138,7 @@
     display: block;
     font-size: 1.8rem;
     font-weight: 500;
-    margin: -7px 0;
+    margin: -10px 0;
 }
 
 .time {
@@ -149,6 +149,30 @@
     font-size: 1.9rem;
     font-weight: 500;
 }
+
+.locationContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.locationIcon {
+    width: 25px;
+    height: 25px;
+    margin-right: 18px;
+    color: #3c6e58;
+}
+
+.locationName {
+    color: #3c6e58;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-align: center;
+    margin: 0;
+}
+
 
 @keyframes loading {
     from {opacity: 0;}

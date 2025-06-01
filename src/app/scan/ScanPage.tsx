@@ -5,7 +5,9 @@ import { notFound, useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from '../../../hooks/useSession';
 import supabase from '../../../lib/supabase';
 import Image from 'next/image';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { User } from '@supabase/supabase-js';
+import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 
 export default function ScanPage() {
   const router = useRouter();
@@ -154,6 +156,13 @@ export default function ScanPage() {
           </div>
           <p className={styles.time}>─</p>
           <p className={styles.time}>{sessionDate.getHours()}:{sessionDate.getMinutes()<10? ("0"+sessionDate.getMinutes()):(sessionDate.getMinutes())}</p>
+        </div>
+        <div className={styles.locationContainer}>
+          <FontAwesomeIcon 
+            icon={faLocationDot}
+            className={styles.locationIcon} 
+            />
+          <p className={styles.locationName}>{sessionInfo.location}</p>
         </div>
       </>
       );

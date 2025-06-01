@@ -1,0 +1,210 @@
+.background {
+    background: linear-gradient(135deg, #e2f7e3 0%, #67966f 100%);
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 15px 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.background::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(149, 167, 149, 0.62);
+  backdrop-filter: blur(5px);
+  z-index: 0;
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 420px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 100%;
+    z-index: 1;
+    padding: 5px 15px;
+    margin-bottom: 90px;
+}
+
+.headerContainer {
+  position:absolute;
+  left: 0;
+  width: 100%;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #3c6e58;
+}
+
+.dateSelector {
+  color: #3c6e58;
+  text-align: center;
+  width: 80%;
+  letter-spacing: -0.7px;
+  margin: 0;
+  justify-content: space-between;
+}
+
+.date {
+  display: inline;
+  width: 24px;
+  font-size: 0.85rem;
+  font-weight: light;
+  margin: 0 1rem;
+  opacity: 0.4;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.selectedDate {
+    display: inline;
+    width: 24px;
+    font-size: 0.85rem;
+    margin: 0 1rem;
+    opacity: 1;
+}
+
+.dateNumber {
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-bottom: -10px;
+}
+
+.weekDay {
+  font-size: 0.85rem;
+  font-weight: light;
+  margin: 0;
+}
+
+.scheduleContainer {
+  margin-top: 150px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 80%;
+  padding: 7px 0;
+}
+
+.groupContainer {
+  display: flex;
+  max-width: 100%;
+  flex-direction:row;
+}
+
+.eventCard {
+  flex: 1;
+  min-width: 75px;
+  height: auto;
+  position: relative;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  padding: 7px;
+  padding-top: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 0 10px rgba(10, 61, 31, 0.4);
+  color: #0c462d;
+}
+
+.eventCard:only-child {
+  position: relative;
+  border-radius: 12px;
+  padding: 20px;
+  padding-top: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 0 10px rgba(10, 61, 31, 0.4);
+}
+
+.nonAcademical {
+  background: rgba(103, 196, 63, 0.5);
+  border-radius: 12px;
+  padding-left: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 0 10px rgba(10, 61, 31, 0.4);
+  color: #0c462d;
+}
+
+.nonAcademical .eventName {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: -10px 0;
+  margin-bottom: 5px;
+}
+
+.startTime {
+  font-size: 0.75rem;
+  font-weight: 300;
+  opacity: 0.8;
+}
+
+
+.eventName {
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+.groupContainer .eventCard:only-child .eventName {
+  font-size: 0.9rem;
+}
+
+.eventTitle {
+  max-height: 80px;
+  overflow: scroll;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  letter-spacing: -1px;
+  text-align: left;
+  color: #3c6e58;
+}
+
+.groupContainer .eventCard:only-child .eventTitle {
+  text-align: justify;
+  font-size: 0.9rem;
+}
+  
+.speaker {
+    font-size: 0.55rem;
+    opacity: 0.7;
+    margin-bottom: 10px;
+  }
+  
+  .groupContainer .eventCard:only-child .speaker {
+  margin-bottom: 5px;
+  font-size: 0.75rem;
+}
+  
+.location {
+  position: absolute;
+  font-size: 0.55rem;
+  font-weight: 700;
+  opacity: 0.7;
+  text-align: right;
+  align-items: baseline;
+  bottom: 5px;
+  right: 5px;
+}
+
+.groupContainer .eventCard:only-child .location {
+  bottom: 10px;
+  font-size: 0.75rem;
+  right: 15px;
+}
