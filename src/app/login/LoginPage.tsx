@@ -276,7 +276,7 @@ export default function LoginPage() {
           />
           <h1 className={styles.formTitle}>Welcome to PEPQA, {userName}!</h1>
           <p>Registration confirmed</p>
-          <button className={styles.submitBtn} onClick={() => {router.push("/confirmation")}}>Check our program</button>
+          <button className={styles.submitBtn} onClick={() => {router.push("/program")}}>Check our program</button>
         </div>
       </div>
     );
