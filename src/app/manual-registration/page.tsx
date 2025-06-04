@@ -12,7 +12,7 @@ interface Attendant {
   name: string;
   email: string;
   phone_number: string;
-  organization: string | null;
+  affiliation: string | null;
 }
 
 interface Session {
@@ -55,7 +55,8 @@ function App() {
       setSessionsLoading(true);
       const { data, error } = await supabase
         .from('sessions')
-        .select('id, name')
+        .select('id, name, type')
+        .neq('type', 'non-academical')
         .order('name', { ascending: true });
 
       if (error) throw error;
@@ -79,7 +80,7 @@ function App() {
       setLoading(true);
       const { data, error } = await supabase
         .from('attendants')
-        .select('id, name, email, phone_number, organization')
+        .select('id, name, email, phone_number, affiliation')
         .order('name', { ascending: true });
 
       if (error) throw error;
@@ -113,7 +114,7 @@ function App() {
     attendant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     attendant.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (attendant.phone_number && attendant.phone_number.includes(searchTerm)) ||
-    (attendant.organization && attendant.organization.toLowerCase().includes(searchTerm.toLowerCase()))
+    (attendant.affiliation && attendant.affiliation.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Obtener nombre de la sesión seleccionada
@@ -285,7 +286,7 @@ function App() {
                     </td>
                     <td>{attendant.email}</td>
                     <td>{attendant.phone_number}</td>
-                    <td>{attendant.organization || 'N/A'}</td>
+                    <td>{attendant.affiliation || 'N/A'}</td>
                   </tr>
                 ))}
               </tbody>
