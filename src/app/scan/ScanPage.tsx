@@ -136,7 +136,7 @@ export default function ScanPage() {
       return () => clearTimeout(timer); // Clear the timer if the component unmounts
     }
   }, [user, loading, router, sessionId]);
-
+  
   function switchSessionType(sessionType: string) {
     const speakerSessions =(
       <>
@@ -188,6 +188,10 @@ export default function ScanPage() {
             <p className={styles.dateNum}>{sessionDate.getDate()}</p>
             <p className={styles.dateInfo}>Jun</p>
           </div>
+          <p className={styles.subtitle}>{sessionInfo.title}</p>
+          <p className={styles.speaker}>Speaker: {sessionInfo.speaker}</p>
+          <p className={styles.description}>{sessionInfo.description}</p>
+          <hr className={styles.divider}></hr>
           <p className={styles.time}>─</p>
           <p className={styles.time}>{sessionDate.getHours()}:{sessionDate.getMinutes()<10? ("0"+sessionDate.getMinutes()):(sessionDate.getMinutes())}</p>
         </div>
@@ -202,6 +206,10 @@ export default function ScanPage() {
         return speakerSessions;
       case 'sponsor session':
         return sponsorSessions;
+      case 'workshop':
+        return speakerSessions;
+      case 'papers session':
+        return speakerSessions;
       default:
         return (<></>);
     }
