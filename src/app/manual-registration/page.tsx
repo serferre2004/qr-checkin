@@ -80,7 +80,7 @@ function App() {
       setLoading(true);
       const { data, error } = await supabase
         .from('attendants')
-        .select('id, name, email, phone_number, affiliation')
+        .select('id, name, last_name, email, phone_number, affiliation')
         .order('name', { ascending: true });
 
       if (error) throw error;
