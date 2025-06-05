@@ -10,6 +10,7 @@ import styles from './App.module.css';
 interface Attendant {
   id: string;
   name: string;
+  last_name: string;
   email: string;
   phone_number: string;
   affiliation: string | null;
@@ -81,7 +82,7 @@ function App() {
       const { data, error } = await supabase
         .from('attendants')
         .select('id, name, last_name, email, phone_number, affiliation')
-        .order('name', { ascending: true });
+        .order('last_name', { ascending: true });
 
       if (error) throw error;
       setAttendants(data as Attendant[]);
@@ -266,6 +267,7 @@ function App() {
               <thead>
                 <tr>
                   <th>Nombre</th>
+                  <th>Apellido</th>
                   <th>Email</th>
                   <th>Teléfono</th>
                   <th>Empresa</th>
@@ -284,6 +286,7 @@ function App() {
                       </div>
                       {attendant.name}
                     </td>
+                    <td>{attendant.last_name}</td>
                     <td>{attendant.email}</td>
                     <td>{attendant.phone_number}</td>
                     <td>{attendant.affiliation || 'N/A'}</td>
